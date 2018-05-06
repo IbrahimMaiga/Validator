@@ -1,7 +1,7 @@
 # Validator
 Data validation based on rules
 
-# Basic utilisation
+# Basic use
 ```sh
 $validator = new class extends \Validator\Core\AbstractValidator {};
 
