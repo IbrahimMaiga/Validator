@@ -3,12 +3,7 @@ Data validation based on rules
 
 # Basic utilisation
 ```sh
-$validator = new class extends \Validator\Core\AbstractValidator {
-    public function __construct(?\Validator\Storage\MessageStorage $storage = null, \Noodlehaus\Config $config = null)
-    {
-        parent::__construct($storage, $config);
-    }
-};;
+$validator = new class extends \Validator\Core\AbstractValidator {};
 
 $validator->defineRules([
     'username' => 'max(50):min(4)',
