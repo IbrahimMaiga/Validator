@@ -11,11 +11,11 @@ class RequiredRule extends AbstractRule
 
     public function defineProcess($value, $actual)
     {
-        return !empty($value);
+        return isset($value) && !empty($value);
     }
 
     public function error()
     {
-        return 'the field $(field) value $(value) not equals to $(actual)';
+        return 'the value of field $(field) is required';
     }
 }

@@ -16,6 +16,6 @@ class MinRule extends AbstractRule
 
     public function error()
     {
-        return 'the value $(value) and field $(field) not equals to $(actual)';
+        return 'the field $(field) with value $(value) must be greater than or equal $(actual)';
     }
 }
