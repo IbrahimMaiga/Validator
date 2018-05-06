@@ -1,0 +1,6 @@
+# Ignore files
+/vendor/
+/composer.lock
+/config/
+/coverage/
+/.idea/*

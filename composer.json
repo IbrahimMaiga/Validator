@@ -1,0 +1,24 @@
+{
+    "name": "kanfa/validator",
+    "description": "Data validator",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ibrahim Maiga",
+            "email": "maiga.ibrm@gmail.com"
+        }
+    ],
+    "require": {
+        "hassankhan/config": "^1.0"
+    },
+    "autoload": {
+        "psr-4" : {"Validator\\": "src/"}
+    },
+    "autoload-dev": {
+        "psr-4" : {"Validator\\Tests\\": "tests/"}
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.1"
+    }
+}
