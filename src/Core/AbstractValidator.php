@@ -180,10 +180,11 @@ abstract class AbstractValidator implements Validator, Error
                 }
             }
 
+            $ruleInstanceKeys = array_keys(self::$rulesInstances);
             foreach ($realRules as $realRule) {
                 $parseResult = $this->parse($realRule);
                 $userMethod = false;
-                if (!array_key_exists($realRule, self::$rulesInstances)) {
+                if (!array_key_exists($realRule, $ruleInstanceKeys)) {
                     $realRule = $parseResult === false ? $realRule : $parseResult[0];
                     if (strpos($realRule, self::COMMA)) {
                         throw new \RuntimeException('Incorrect value in parameters');
