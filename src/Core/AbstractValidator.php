@@ -93,8 +93,11 @@ abstract class AbstractValidator implements Validator, Error
     {
         $rules = [];
         if ($this->config !== null) {
-            $this->checkInconsistency(array_keys($this->config->get($this->config->key())), array_keys($data));
-            $name = Helpers::getName($this, 'validator');
+            $this->checkInconsistency(array_keys(!empty($this->key())
+                ? $this->config->get($this->key())
+                : $this->config->all()), array_keys($data));
+
+            $name = !empty($this->key()) ? $this->key() : Helpers::getName($this, $this->getSuffix());
             foreach ($data as $key => $value) {
                 $temp = $key;
                 if ($this->config->has($name)) {
@@ -112,37 +115,6 @@ abstract class AbstractValidator implements Validator, Error
         }
 
         return $this->validateRules($rules, $data, $optionals);
-    }
-
-    /**
-     * Binds a custom message to the error
-     * @param string $fieldName the group key
-     * @param string $rule rule who caused error
-     * @param string $message error message
-     */
-    public function bindMessage($fieldName, $rule, $message)
-    {
-        $this->bindData[] = [$fieldName, $rule, $message];
-    }
-
-    /**
-     * Sets defined rules
-     * this approach works only if a configuration file is not given,
-     * otherwise it will be ignored
-     * @param array $rules
-     */
-    public function defineRules(array $rules)
-    {
-        $this->definedRules = $rules;
-    }
-
-    /**
-     * Way to extend rules
-     * @return array the rules to add to the default rules
-     */
-    public function ExtendRuleClasses()
-    {
-        return [];
     }
 
     /**
@@ -202,8 +174,14 @@ abstract class AbstractValidator implements Validator, Error
                 }
                 $parseKey = $parseResult === false ? '' : $parseResult[1];
                 if ($parseResult !== false) {
+                    if (strpos($parseKey, self::COLON)) {
+                        $parseKey = substr($parseKey, 1);
+                    }
+
                     if (array_key_exists($parseKey, $rules) && array_key_exists($parseKey, $data)) {
                         $parseKey = $data[$parseKey];
+                    } else {
+                        throw new \RuntimeException(sprintf('key %s not found', $parseKey));
                     }
                 }
                 $params[$realRule] = [self::FIELD => $key, self::VALUE => $data[$key], self::ACTUAL => $parseKey];
@@ -218,6 +196,54 @@ abstract class AbstractValidator implements Validator, Error
             $this->formatErrors($this->storage, $params);
         }
         return $validation;
+    }
+
+    /**
+     * Binds a custom message to the error
+     * @param string $fieldName the group key
+     * @param string $rule rule who caused error
+     * @param string $message error message
+     */
+    public function bindMessage($fieldName, $rule, $message)
+    {
+        $this->bindData[] = [$fieldName, $rule, $message];
+    }
+
+    /**
+     * Sets defined rules
+     * this approach works only if a configuration file is not given,
+     * otherwise it will be ignored
+     * @param array $rules
+     */
+    public function defineRules(array $rules)
+    {
+        $this->definedRules = $rules;
+    }
+
+    /**
+     * Way to extend rules
+     * @return array the rules to add to the default rules
+     */
+    public function ExtendRuleClasses()
+    {
+        return [];
+    }
+
+    /**
+     * Returns class name suffix
+     * @return string class name suffix
+     */
+    public function getSuffix() {
+        return 'validator';
+    }
+
+    /**
+     * Returns the json configuration key that identity rules group, only for json configuration
+     * with some classes data configuration
+     * @return string the json configuration key that identity rules group
+     */
+    public function key() {
+        return '';
     }
 
     /**
@@ -240,12 +266,12 @@ abstract class AbstractValidator implements Validator, Error
     {
         $errors = $storage->toArray();
         foreach ($errors as $groupName => $groupData) {
-            foreach ($groupData as $key => $value) {
-                $result = preg_replace_callback(self::REPLACEMENT_REGEX,
-                    function ($matches) use ($params, $key) {
-                        return $params[$key][$matches[1]];
-                }, $value);
-                $storage->getGroup($groupName)->set($key, $result);
+            foreach ($groupData as $rule => $message) {
+                $formattedMessage = preg_replace_callback(self::REPLACEMENT_REGEX,
+                    function ($matches) use ($params, $rule) {
+                        return $params[$rule][$matches[1]];
+                }, $message);
+                $storage->getGroup($groupName)->set($rule, $formattedMessage);
             }
         }
     }
