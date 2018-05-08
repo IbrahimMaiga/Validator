@@ -16,6 +16,14 @@ class Helpers
         // prevent initialisation
     }
 
+    /**
+     * Return the part of class name
+     * @param $obj
+     * @param string $suffix
+     * @return string part of obj class name if class name if not anonymous class other
+     * throw RuntimeException
+     * @throws \RuntimeException
+     */
     public static function getName($obj, string $suffix = '')
     {
         $className = get_class($obj);
@@ -28,9 +36,15 @@ class Helpers
             $end = substr($className, 1, $length);
             return $first . $end;
         }
-        return false;
+
+        throw new \RuntimeException(sprintf('% is a incorrect class format name', $className));
     }
 
+    /**
+     * Check if class name correspond to anonymous class name
+     * @param string $className the class name to check
+     * @return bool return true if class is anonymous class otherwise false
+     */
     public static function isAnonymousClass(string $className)
     {
         return strpos($className, 'class@anonymous') > 0;
