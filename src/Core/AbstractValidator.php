@@ -3,6 +3,7 @@
 namespace Validator\Core;
 
 use Noodlehaus\Config;
+use Validator\Exception\KeyNotFoundException;
 use Validator\Exception\RuleExistException;
 use Validator\Exception\RuleNotFoundException;
 use Validator\Exception\ValidationException;
@@ -183,12 +184,12 @@ abstract class AbstractValidator implements Validator, Error
                 if ($parseResult !== false) {
                     if (strpos($parseKey, self::COLON)) {
                         $parseKey = substr($parseKey, 1);
-                    }
 
-                    if (array_key_exists($parseKey, $rules) && array_key_exists($parseKey, $data)) {
-                        $parseKey = $data[$parseKey];
-                    } else {
-                        throw new \RuntimeException(sprintf('key %s not found', $parseKey));
+                        if (array_key_exists($parseKey, $rules) && array_key_exists($parseKey, $data)) {
+                            $parseKey = $data[$parseKey];
+                        } else {
+                            throw new KeyNotFoundException(sprintf('key %s not found', $parseKey));
+                        }
                     }
                 }
                 $params[$realRule] = [self::FIELD => $key, self::VALUE => $data[$key], self::ACTUAL => $parseKey];
