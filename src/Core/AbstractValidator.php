@@ -3,6 +3,7 @@
 namespace Validator\Core;
 
 use Noodlehaus\Config;
+use Validator\Exception\RuleExistException;
 use Validator\Exception\RuleNotFoundException;
 use Validator\Exception\ValidationException;
 use Validator\Storage\DefaultMessageStorage;
@@ -128,7 +129,7 @@ abstract class AbstractValidator implements Validator, Error
     {
         $validation = true;
         $params = [];
-        $rulesClasses = array_merge(self::$defaultRulesClasses, $this->ExtendRuleClasses());
+        $rulesClasses = array_merge(self::$defaultRulesClasses, $this->additionnalRules());
         foreach ($rules as $key => $value) {
             $realRules = $value;
             if (strpos($value, self::PIPE)) {
@@ -167,7 +168,13 @@ abstract class AbstractValidator implements Validator, Error
                         self::$rulesInstances[$realRule] = new $class($this->storage);
                     } elseif (in_array($realRule, array_diff(get_class_methods($this),
                         get_class_methods(get_parent_class($this))))) {
-                        $userMethod = true;
+                        if (!in_array($realRule, array_keys($rulesClasses))) {
+                            $userMethod = true;
+                        } else {
+                            throw new RuleExistException(sprintf('the rule %s already exists
+                             in the list of rules, we can only replace a rule by overloading the method 
+                             additionnalRules()', $realRule));
+                        }
                     } else {
                         throw new RuleNotFoundException(sprintf('%s not found in rules', $realRule));
                     }
@@ -224,7 +231,7 @@ abstract class AbstractValidator implements Validator, Error
      * Way to extend rules
      * @return array the rules to add to the default rules
      */
-    public function ExtendRuleClasses()
+    public function additionnalRules()
     {
         return [];
     }
