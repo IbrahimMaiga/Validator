@@ -19,13 +19,21 @@ class Helpers
     public static function getName($obj, string $suffix = '')
     {
         $className = get_class($obj);
-        $tempArray = explode('\\', $className);
-        $className = $tempArray[count($tempArray) - 1];
-        $first = strtolower(substr($className, 0, 1));
-        $length = strpos(strtolower($className), $suffix) === false ? null
-        :  strlen($className) - (strlen($suffix) + 1);
-        $end = substr($className, 1, $length);
-        return $first . $end;
+        if (false !== self::isAnonymousClass($className)) {
+            $tempArray = explode('\\', $className);
+            $className = $tempArray[count($tempArray) - 1];
+            $first = strtolower(substr($className, 0, 1));
+            $length = strpos(strtolower($className), $suffix) === false ? null
+                :  strlen($className) - (strlen($suffix) + 1);
+            $end = substr($className, 1, $length);
+            return $first . $end;
+        }
+        return false;
+    }
+
+    public static function isAnonymousClass(string $className)
+    {
+        return strpos($className, 'class@anonymous') > 0;
     }
 
 }
