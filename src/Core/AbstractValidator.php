@@ -160,7 +160,7 @@ abstract class AbstractValidator implements Validator, Error
                 if (!array_key_exists($realRule, $ruleInstanceKeys)) {
                     $realRule = $parseResult === false ? $realRule : $parseResult[0];
                     if (strpos($realRule, self::COMMA)) {
-                        throw new \RuntimeException('Incorrect value in parameters');
+                        throw new \InvalidArgumentException('Incorrect value in parameters');
                     }
 
                     if (in_array($realRule, array_keys($rulesClasses))) {
