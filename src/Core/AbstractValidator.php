@@ -39,6 +39,7 @@ abstract class AbstractValidator implements Validator, Error
         'equals' => 'Validator\Rule\EqualsRule',
         'match' => 'Validator\Rule\MatchRule',
         'required' => 'Validator\Rule\RequiredRule',
+        'email' => 'Validator\Rule\EmailRule',
     ];
 
     /**
