@@ -129,7 +129,7 @@ abstract class AbstractValidator implements Validator, Error
     {
         $validation = true;
         $params = [];
-        $rulesClasses = array_merge(self::$defaultRulesClasses, $this->additionnalRules());
+        $rulesClasses = array_merge(self::$defaultRulesClasses, $this->additionalRules());
         foreach ($rules as $key => $value) {
             $realRules = $value;
             if (strpos($value, self::PIPE)) {
@@ -173,7 +173,7 @@ abstract class AbstractValidator implements Validator, Error
                         } else {
                             throw new RuleExistException(sprintf('the rule %s already exists
                              in the list of rules, we can only replace a rule by overloading the method 
-                             additionnalRules()', $realRule));
+                             additionalRules()', $realRule));
                         }
                     } else {
                         throw new RuleNotFoundException(sprintf('%s not found in rules', $realRule));
@@ -231,7 +231,7 @@ abstract class AbstractValidator implements Validator, Error
      * Way to extend rules
      * @return array the rules to add to the default rules
      */
-    public function additionnalRules()
+    public function additionalRules()
     {
         return [];
     }
