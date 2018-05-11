@@ -47,7 +47,7 @@ class Helpers
      */
     public static function isAnonymousClass(string $className)
     {
-        return strpos($className, 'class@anonymous') > 0;
+        return strpos($className, 'class@anonymous') >= 0;
     }
 
 }
