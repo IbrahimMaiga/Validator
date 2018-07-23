@@ -85,6 +85,7 @@ abstract class AbstractRule implements Rule
         }
         return $value;
     }
-    public abstract function defineProcess($value, $actual);
+    
+    public abstract function defineProcess(array$value, $actual);
     public abstract function error();
 }

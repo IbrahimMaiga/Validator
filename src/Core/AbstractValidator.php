@@ -19,7 +19,7 @@ use Validator\Utils\Helpers;
  */
 abstract class AbstractValidator implements Validator, Error
 {
-    private const REGEX = '/(\w[A-Za-z0-9_$]+)\(([A-Za-z0-9]+)\)/';
+    private const REGEX = '/(\w[A-Za-z0-9_$]+)\(([A-Za-z0-9-:\/]+)\)/';
     private const REPLACEMENT_REGEX = '/\$\((\w+)\)/';
     private const COLON = ':';
     private const PIPE = '|';
@@ -40,6 +40,10 @@ abstract class AbstractValidator implements Validator, Error
         'match' => 'Validator\Rule\MatchRule',
         'required' => 'Validator\Rule\RequiredRule',
         'email' => 'Validator\Rule\EmailRule',
+        'date' => 'Validator\Rule\DateRule',
+        'string' => 'Validator\Rule\StringRule',
+        'int' => 'Validator\Rule\IntRule',
+        'double' => 'Validator\Rule\DoubleRule',
     ];
 
     /**
@@ -96,11 +100,18 @@ abstract class AbstractValidator implements Validator, Error
     {
         $rules = [];
         if ($this->config !== null) {
-            $this->checkInconsistency(array_keys(!empty($this->key())
+            $this->checkInconsistency(array_keys(
+                !empty($this->key())
                 ? $this->config->get($this->key())
-                : $this->config->all()), array_keys($data));
+                : $this->config->all()), array_keys($data)
+              );
 
             $name = !empty($this->key()) ? $this->key() : Helpers::getName($this, $this->getSuffix());
+
+            if (false === $name) {
+                throw new \RuntimeException(sprintf('% is a incorrect class format name', get_class($this)));
+            }
+
             foreach ($data as $key => $value) {
                 $temp = $key;
                 if ($this->config->has($name)) {
@@ -160,7 +171,7 @@ abstract class AbstractValidator implements Validator, Error
                 $parseResult = $this->parse($realRule);
                 $userMethod = false;
                 if (!array_key_exists($realRule, $ruleInstanceKeys)) {
-                    $realRule = $parseResult === false ? $realRule : $parseResult[0];
+                    $realRule = ($parseResult === false) ? $realRule : $parseResult[0];
                     if (strpos($realRule, self::COMMA)) {
                         throw new \InvalidArgumentException('Incorrect value in parameters');
                     }
@@ -174,14 +185,14 @@ abstract class AbstractValidator implements Validator, Error
                             $userMethod = true;
                         } else {
                             throw new RuleExistException(sprintf('the rule %s already exists
-                             in the list of rules, we can only replace a rule by overloading the method 
+                             in the list of rules, we can only replace a rule by overloading the method
                              additionalRules()', $realRule));
                         }
                     } else {
                         throw new RuleNotFoundException(sprintf('%s not found in rules', $realRule));
                     }
                 }
-                $parseKey = $parseResult === false ? '' : $parseResult[1];
+                $parseKey = ($parseResult === false) ? '' : $parseResult[1];
                 if ($parseResult !== false) {
                     if (strpos($parseKey, self::COLON)) {
                         $parseKey = substr($parseKey, 1);
@@ -260,10 +271,12 @@ abstract class AbstractValidator implements Validator, Error
      */
     private function doBinding(array $bindData)
     {
-        foreach ($bindData as $data) {
-            $this->storage->checkAndSet($data[0], $data[1], $data[2]);
+        if (count($bindData) === 3) {
+            foreach ($bindData as $data) {
+                $this->storage->checkAndSet($data[0], $data[1], $data[2]);
+            }
+            $this->bindData = [];
         }
-        $this->bindData = [];
     }
 
     /**

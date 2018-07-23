@@ -20,9 +20,9 @@ class Helpers
      * Return the part of class name
      * @param $obj
      * @param string $suffix
-     * @return string part of obj class name if class name if not anonymous class other
+     * @return string|false part of obj class name if class name if not anonymous class other
+     * otherwise false
      * throw RuntimeException
-     * @throws \RuntimeException
      */
     public static function getName($obj, string $suffix = '')
     {
@@ -37,7 +37,7 @@ class Helpers
             return $first . $end;
         }
 
-        throw new \RuntimeException(sprintf('% is a incorrect class format name', $className));
+        return false;
     }
 
     /**
